@@ -114,7 +114,7 @@ class TableExtractor:
                 elif dictionary['t'] == 'LineBreak':
                     self.add_content('\n\n')
         except KeyError:
-            print('Incompatible Pandoc version')
+            print('Untypical block. Some information might be lost.')
 
     def list_parse(self, content_list, without_write=False):
         """Parse list.
@@ -129,8 +129,7 @@ class TableExtractor:
             elif type(item) == list:
                 self.list_parse(item, without_write)
             else:
-                print('ERROR: parse type error, got ' + str(type(item)) + ' expected dict or list. '
-                                                                          'Some information might be lost.')
+                print('Untypical block. Some information might be lost.')
 
     def main(self, document):
         """Main function.

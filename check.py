@@ -1,7 +1,7 @@
 from apiclient import errors
-from apiclient import discovery
+from apiclient.discovery import build
 from httplib2 import Http
-from oauth2client import file, client, tools
+from oauth2client import file as oauth_file, client, tools
 
 CLIENT_SECRETS_FILE = "client_secret.json"
 SCOPES = ['https://www.googleapis.com/auth/documents']
@@ -11,13 +11,12 @@ SCRIPT_ID = 'MfUCDEAFYCuUxb_9IPU7Cho8zoCCdfz7A'
 
 
 def run_comparison(gdoc_id, tables):
-    store = file.Storage('token.json')
+    store = oauth_file.Storage('token.json')
     creds = store.get()
     if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
+        flow = client.flow_from_clientsecrets('credentials.json', SCOPES, )
         creds = tools.run_flow(flow, store)
-    service = discovery.build(API_SERVICE_NAME, API_VERSION, http=creds.authorize(Http()))
-
+    service = build(API_SERVICE_NAME, API_VERSION, http=creds.authorize(Http()))
     # Call the Apps Script API
     try:
         # call for comparing script

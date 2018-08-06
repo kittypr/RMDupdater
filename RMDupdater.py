@@ -2,8 +2,8 @@ import argparse
 import check
 import mdparse
 
-parser = argparse.ArgumentParser(description='RMDupdater checks tables from given MD doc and Gdoc '
-                                             'and finds differences.')
+parser = argparse.ArgumentParser(description='RMDupdater checks tables from given MD doc and Gdoc, '
+                                             'finds differences, logs code that generates outdated information.')
 parser.add_argument('input', help='Input file. Use Pandoc`s input formats.', action='store')
 parser.add_argument('gdoc_id', help='Gdoc id.', action='store')
 args = parser.parse_args()
@@ -35,7 +35,10 @@ def main():
     if result:
         for index in tables.keys():
             if index[1] in result:
-                changed_code_ancestors = index[0] + '/n #'
+                if index[1] == 0:
+                    changed_code_ancestors += index[0] + '\n#'
+                else:
+                    changed_code_ancestors += '\n' + index[0] + '\n#'
     write_changes_file(changed_code_ancestors)
 
 
