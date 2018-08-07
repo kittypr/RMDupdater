@@ -109,9 +109,9 @@ class TableExtractor:
                 if dictionary['t'] == 'Space':
                     self.add_content(' ')
                 elif dictionary['t'] == 'SoftBreak':
-                    self.add_content('\n')
+                    self.add_content(' ')
                 elif dictionary['t'] == 'LineBreak':
-                    self.add_content('\n\n')
+                    self.add_content('\n')
         except KeyError:
             print('Untypical block. Some information might be lost.')
 
