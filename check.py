@@ -11,11 +11,10 @@ SCRIPT_ID = 'MfUCDEAFYCuUxb_9IPU7Cho8zoCCdfz7A'
 
 
 def run_comparison(gdoc_id, tables):
+    """Calls the Apps Script API.
+    """
     store = oauth_file.Storage('token.json')
     creds = store.get()
-    if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets('credentials.json', SCOPES, )
-        creds = tools.run_flow(flow, store)
     service = build(API_SERVICE_NAME, API_VERSION, http=creds.authorize(Http()))
     # Call the Apps Script API
     try:
@@ -26,4 +25,6 @@ def run_comparison(gdoc_id, tables):
         print(response)
         return response['response']['result']
     except errors.HttpError as e:
+        print('PROCESS FAILED. SEE BELOW:')
         print(str(e.content))
+        return None

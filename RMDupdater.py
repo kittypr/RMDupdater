@@ -1,4 +1,6 @@
 import argparse
+import subprocess
+
 import check
 import mdparse
 
@@ -8,7 +10,11 @@ parser.add_argument('input', help='Input file. Use Pandoc`s input formats.', act
 parser.add_argument('gdoc_id', help='Gdoc id.', action='store')
 args = parser.parse_args()
 
-point = {'t': 'Para', 'c': [{'t': 'Str', 'c': '***WAS_CHANGED/REPLACED/REMOVED***'}]}
+
+def check_token():
+    command = 'python create_token.py'
+    proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc.communicate()
 
 
 def write_changes_file(changed_code_ancestors):
@@ -19,8 +25,10 @@ def write_changes_file(changed_code_ancestors):
 def main():
     extractor = mdparse.TableExtractor()
     tables = extractor.parse(args.input)
+    if tables is None:
+        return
     tables_array = list()  # this array will be sent to apps script api
-    for index in tables.keys():  # creating array with
+    for index in tables.keys():  # creating array with tables and indexes, deleting empty headers.
         table = tables[index]
         header_row = table[0]
         has_content = False
@@ -30,15 +38,15 @@ def main():
         if not has_content:
             table.pop(0)
         tables_array.append(table)
+    check_token()
     result = check.run_comparison(gdoc_id=args.gdoc_id, tables=tables_array)
+    if result is None:
+        return
     changed_code_ancestors = ''
-    if result:
-        for index in tables.keys():
-            if index[1] in result:
-                if index[1] == 0:
-                    changed_code_ancestors += index[0] + '\n#'
-                else:
-                    changed_code_ancestors += '\n' + index[0] + '\n#'
+    for index in tables.keys():
+        if index[1] in result:
+            changed_code_ancestors += '# CONTEXT\n' + index[0][0] + '\n# CHANGED BLOCK\n' + index[0][1] +\
+                                          '\n# END\n'
     write_changes_file(changed_code_ancestors)
 
 

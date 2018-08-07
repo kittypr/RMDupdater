@@ -11,8 +11,8 @@ BLOCK = ('Div', 'Header', 'Span')
 class TableExtractor:
 
     def __init__(self):
-        self.string_to_write = ''
         self.tables = dict()
+        self.context = ''
         self.ancestor = ''
         self.content = ''
 
@@ -24,8 +24,12 @@ class TableExtractor:
     def add_content(self, addition):
         self.content = self.content + addition
 
+    def save_ancestor(self, ancestor):
+        self.context = copy(self.ancestor)
+        self.ancestor = ancestor
+
     def write_code(self, code):
-        """Write to output file code elements.
+        """Saves code block that creates other elements in case ones were changed.
         Since, element with title 'Code' or 'CodeBlock' has special structure of 'c'(Content) field, that looks like:
         [[0], 'code']
         where:
@@ -35,19 +39,16 @@ class TableExtractor:
         Args:
             code - element with title 'Code' or 'CodeBlock'.
         """
-        self.ancestor = code['c'][1]
+        self.save_ancestor(code['c'][1])
 
     def write_special_block(self, block):
         con = 1
         if block['t'] == 'Header':
             con = 2
-        self.list_parse(block['c'][con], without_write=True)
+        self.list_parse(block['c'][con], cell_content=True)
 
     def write_table(self, tab):
-        """Write to output file table elements.
-        This function is called every time, we meet 'Table' dictionary's title.
-        Firstly, if we have some information in 'string_to_write' we record it, because we'll use this
-        variable to collect information from table's cells.
+        """Extracts table and saves them with code block they were made from.
         Table in pandoc's json has following structure:
         dict: { 't': 'Table'
                 'c': [ [0] [1] [2] [3] [4] ]
@@ -62,13 +63,12 @@ class TableExtractor:
         Args:
             tab - dictionary with 't': 'Table".
         """
-
         table = list()
         row = list()
         headers = tab['c'][3]
         if headers:
             for col in headers:
-                self.list_parse(col, without_write=True)
+                self.list_parse(col, cell_content=True)
                 cell_content = self.get_content()
                 row.append(cell_content)
             table.append(row)
@@ -76,37 +76,36 @@ class TableExtractor:
         for line in t_content:
             row = list()
             for col in line:
-                self.list_parse(col, without_write=True)
+                self.list_parse(col, cell_content=True)
                 cell_content = self.get_content()
                 row.append(cell_content)
             table.append(row)
-        self.tables[(self.ancestor, len(self.tables))] = table
+        self.tables[((self.context, self.ancestor), len(self.tables))] = table
 
-    def dict_parse(self, dictionary, without_write=False):
+    def dict_parse(self, dictionary, cell_content=False):
         """Parse dictionaries.
         Dictionary represents some json-object. The kind of json object depends on its 't' (title) field.
         We will parse it differently depending on different titles.
 
         Args:
             dictionary - object with 't' and sometimes 'c' fields.
-            without_write - indicate inside/outside table TODO: CHANGE VARIABLE NAME
+            cell_content - indicates either we inside or outside of table cell
         """
-
         try:
             if dictionary['t'] in TABLE:  # blocks that may have content
                 self.write_table(dictionary)
-            elif dictionary['t'] in BLOCK and without_write:  # parse it only if it is inside table
+            elif dictionary['t'] in BLOCK and cell_content:  # parse it only if it is inside table
                 self.write_special_block(dictionary)
-            elif dictionary['t'] in CODE and not without_write:  # parse it only if it is outside table
+            elif dictionary['t'] in CODE and not cell_content:  # parse it only if it is outside table
                 self.write_code(dictionary)
-            elif dictionary['t'] == 'Para' and without_write:
+            elif dictionary['t'] == 'Para' and cell_content:
                 self.add_content('\n')
-            elif 'c' in dictionary and without_write:
+            elif 'c' in dictionary and cell_content:
                 if type(dictionary['c']) == str:
                     self.add_content(dictionary['c'])
                 if type(dictionary['c']) == list:
-                    self.list_parse(dictionary['c'], without_write)
-            elif without_write:  # blocks without content
+                    self.list_parse(dictionary['c'], cell_content)
+            elif cell_content:  # blocks without content
                 if dictionary['t'] == 'Space':
                     self.add_content(' ')
                 elif dictionary['t'] == 'SoftBreak':
@@ -116,27 +115,27 @@ class TableExtractor:
         except KeyError:
             print('Untypical block. Some information might be lost.')
 
-    def list_parse(self, content_list, without_write=False):
+    def list_parse(self, content_list, cell_content=False):
         """Parse list.
 
         Args:
             content_list - list with different parts of content from input-document.
-            without_write - indicate calling write_text() functions. By default calls it.
+            cell_content - indicates either we inside or outside of table cell
         """
         for item in content_list:
             if type(item) == dict:
-                self.dict_parse(item, without_write)
+                self.dict_parse(item, cell_content)
             elif type(item) == list:
-                self.list_parse(item, without_write)
+                self.list_parse(item, cell_content)
             else:
                 print('Untypical block. Some information might be lost.')
 
-    def main(self, document):
+    def document_parse(self, document):
         """Main function.
         Gets JSON object from Pandoc, parses it and extracts tables.
 
         Args:
-            doc - json object as python dictionary or list.
+            document - json object as python dictionary or list.
                   In case of dictionary it has representation like:
                   { 'pandoc-version': ...
                     'meta': ...
@@ -145,21 +144,22 @@ class TableExtractor:
                   In case of list it has representation like:
                   [[info_list], [content_list]], so we will parse doc[1].
         """
-
         if type(document) == dict:
             self.list_parse(document['blocks'])
         elif type(document) == list:
             self.list_parse(document[1])
         else:
-            print('Incompatible Pandoc version')
+            print('Incompatible Pandoc version. Process failed.')
 
     def parse(self, source):
         command = 'pandoc ' + source + ' -t json'
         proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         res = proc.communicate()
         if res[1]:
-            print(str(res[1]))  # sending stderr output to user
+            print('PROCESS FAILED. SEE BELOW:')
+            print(str(res[1]))
+            return None  # sending stderr output to user
         else:
             document = json.loads(res[0])
-            self.main(document)
+            self.document_parse(document)
             return self.tables
