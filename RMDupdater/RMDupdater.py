@@ -2,7 +2,7 @@ import argparse
 import os
 import subprocess
 
-import check, mdparse
+from RMDupdater import check, mdparse
 
 
 def check_token():
