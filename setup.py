@@ -1,9 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='RMDupdater',
     version='0.01',
-    packages=[''],
+    packages=find_packages(),
     url='https://github.com/kittypr/RMDupdater',
     license='MIT',
     author='Julia Zhuk',
