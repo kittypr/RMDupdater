@@ -2,13 +2,7 @@ import argparse
 import os
 import subprocess
 
-from RMDupdater import check, mdparse
-
-parser = argparse.ArgumentParser(description='RMDupdater checks tables from given MD doc and Gdoc, '
-                                             'finds differences, logs code that generates outdated information.')
-parser.add_argument('input', help='*.md file generated from *.rmd with "echo=TRUE"', action='store')
-parser.add_argument('gdoc_id', help='Gdoc id.', action='store')
-args = parser.parse_args()
+import check, mdparse
 
 
 def check_token():
@@ -53,6 +47,11 @@ def main(input_echo_md, gdoc_id):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='RMDupdater checks tables from given MD doc and Gdoc, '
+                                                 'finds differences, logs code that generates outdated information.')
+    parser.add_argument('input', help='*.md file generated from *.rmd with "echo=TRUE"', action='store')
+    parser.add_argument('gdoc_id', help='Gdoc id.', action='store')
+    args = parser.parse_args()
     gdoc_id = args.gdoc_id
     input_echo_md = args.input
-    main()
+    main(input_echo_md, gdoc_id)
