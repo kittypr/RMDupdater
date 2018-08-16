@@ -1,20 +1,22 @@
 import argparse
+import os
 import subprocess
 
-import check
-import mdparse
+from RMDupdater import check, mdparse
 
 parser = argparse.ArgumentParser(description='RMDupdater checks tables from given MD doc and Gdoc, '
                                              'finds differences, logs code that generates outdated information.')
-parser.add_argument('input', help='Input file. Use Pandoc`s input formats.', action='store')
+parser.add_argument('input', help='*.md file generated from *.rmd with "echo=TRUE"', action='store')
 parser.add_argument('gdoc_id', help='Gdoc id.', action='store')
 args = parser.parse_args()
 
 
 def check_token():
-    command = 'python create_token.py'
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    command = 'python ' + dir_path + '\create_token.py'
     proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    proc.communicate()
+    answer = proc.communicate()
+    print(answer)
 
 
 def write_changes_file(changed_code_ancestors):
@@ -22,9 +24,9 @@ def write_changes_file(changed_code_ancestors):
         changes_file.write(changed_code_ancestors)
 
 
-def main():
+def main(input_echo_md, gdoc_id):
     extractor = mdparse.TableExtractor()
-    tables = extractor.parse(args.input)
+    tables = extractor.parse(input_echo_md)
     if tables is None:
         return
     tables_array = list()  # this array will be sent to apps script api
@@ -39,7 +41,7 @@ def main():
             table.pop(0)
         tables_array.append(table)
     check_token()
-    result = check.run_comparison(gdoc_id=args.gdoc_id, tables=tables_array)
+    result = check.run_comparison(gdoc_id=gdoc_id, tables=tables_array)
     if result is None:
         return
     changed_code_ancestors = ''
@@ -51,4 +53,6 @@ def main():
 
 
 if __name__ == '__main__':
+    gdoc_id = args.gdoc_id
+    input_echo_md = args.input
     main()
