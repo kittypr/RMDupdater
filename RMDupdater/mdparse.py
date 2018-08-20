@@ -10,11 +10,12 @@ BLOCK = ('Div', 'Header', 'Span')
 
 class TableExtractor:
 
-    def __init__(self):
+    def __init__(self, warnings):
         self.tables = dict()
         self.context = ''
         self.ancestor = ''
         self.content = ''
+        self.warnings = warnings
 
     def get_content(self):
         content = copy(self.content)
@@ -113,7 +114,8 @@ class TableExtractor:
                 elif dictionary['t'] == 'LineBreak':
                     self.add_content('\n')
         except KeyError:
-            print('Untypical block. Some information might be lost.')
+            if self.warnings:
+                print('Untypical block. Some information might be lost.')
 
     def list_parse(self, content_list, cell_content=False):
         """Parse list.
@@ -128,7 +130,8 @@ class TableExtractor:
             elif type(item) == list:
                 self.list_parse(item, cell_content)
             else:
-                print('Untypical block. Some information might be lost.')
+                if self.warnings:
+                    print('Untypical block. Some information might be lost.')
 
     def document_parse(self, document):
         """Main function.

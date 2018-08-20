@@ -20,9 +20,7 @@ def run_comparison(gdoc_id, tables):
     try:
         # call for comparing script
         request = {'function': 'compare', 'parameters': [gdoc_id, tables]}
-        response = service.scripts().run(body=request,
-                                         scriptId=SCRIPT_ID).execute()
-        print(response)
+        response = service.scripts().run(body=request, scriptId=SCRIPT_ID).execute()
         return response['response']['result']
     except errors.HttpError as e:
         print('PROCESS FAILED. SEE BELOW:')

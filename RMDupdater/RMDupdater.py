@@ -1,16 +1,16 @@
+#!/usr/bin/env python3
 import argparse
 import os
 import subprocess
 
-from RMDupdater import check, mdparse
+import check, mdparse
 
 
 def check_token():
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    command = 'python ' + dir_path + '\create_token.py'
+    command = 'python ' + dir_path + '\create_token.py'  # FIX THIS
     proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     answer = proc.communicate()
-    print(answer)
 
 
 def write_changes_file(changed_code_ancestors):
@@ -18,11 +18,11 @@ def write_changes_file(changed_code_ancestors):
         changes_file.write(changed_code_ancestors)
 
 
-def main(input_echo_md, gdoc_id):
-    extractor = mdparse.TableExtractor()
+def main(input_echo_md, gdoc_id, warnings=False):
+    extractor = mdparse.TableExtractor(warnings)
     tables = extractor.parse(input_echo_md)
     if tables is None:
-        return
+        return  # some errors occurred
     tables_array = list()  # this array will be sent to apps script api
     for index in tables.keys():  # creating array with tables and indexes, deleting empty headers.
         table = tables[index]
@@ -36,8 +36,13 @@ def main(input_echo_md, gdoc_id):
         tables_array.append(table)
     check_token()
     result = check.run_comparison(gdoc_id=gdoc_id, tables=tables_array)
-    if result is None:
+    if result is None:  # some errors occurred
         return
+    if len(result) == 0:
+        print('UP TO DATE')
+    else:
+        print('OUTDATED BLOCKS FOUNDED')
+
     changed_code_ancestors = ''
     for index in tables.keys():
         if index[1] in result:
@@ -54,4 +59,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     gdoc_id = args.gdoc_id
     input_echo_md = args.input
-    main(input_echo_md, gdoc_id)
+    main(input_echo_md, gdoc_id, warnings=False)
+
