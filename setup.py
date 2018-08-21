@@ -11,7 +11,7 @@ setup(
     description='Script for detecting difference between local.md file and gdrivefile',
 
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.7',
     ],
