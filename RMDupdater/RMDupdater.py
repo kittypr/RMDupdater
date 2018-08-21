@@ -7,8 +7,7 @@ import check, mdparse
 
 
 def check_token():
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    command = 'python ' + dir_path + '\create_token.py'  # FIX THIS
+    command = 'RMDupdater_create_token.py'  # FIX THIS
     proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     answer = proc.communicate()
 

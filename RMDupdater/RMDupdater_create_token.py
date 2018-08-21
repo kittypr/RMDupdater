@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 
 from oauth2client import file as oauth_file, client, tools
@@ -6,11 +8,12 @@ SCOPES = ['https://www.googleapis.com/auth/documents']
 
 
 def create():
-    dir_path = os.path.dirname(os.path.realpath(__file__))
     store = oauth_file.Storage('token.json')
     creds = store.get()
+    path_to_script = os.path.dirname(os.path.abspath(__file__))
+    client_secret_file = os.path.join(path_to_script, 'credentials.json')
     if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets(dir_path + '/credentials.json', SCOPES)
+        flow = client.flow_from_clientsecrets(client_secret_file, SCOPES)
         tools.run_flow(flow, store)
 
 
