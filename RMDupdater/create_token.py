@@ -10,7 +10,7 @@ def create():
     store = oauth_file.Storage('token.json')
     creds = store.get()
     if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets(dir_path + '\credentials.json', SCOPES)  # fix this
+        flow = client.flow_from_clientsecrets(dir_path + '/credentials.json', SCOPES)
         tools.run_flow(flow, store)
 
 
