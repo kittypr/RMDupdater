@@ -17,5 +17,5 @@ setup(
     ],
 
     install_requires=['oauth2client', 'google-api-python-client', 'httplib2'],
-    scripts=['RMDupdater/RMDupdater.py', 'RMDupdater/RMDupdater_create_token.py']
+    scripts=['RMDupdater/RMD_updater.py', 'RMDupdater/RMD_updater_create_token.py']
 )
