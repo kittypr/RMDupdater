@@ -45,8 +45,8 @@ def main(input_echo_md, gdoc_id, warnings=False):
     changed_code_ancestors = ''
     for index in tables.keys():
         if index[1] in result:
-            changed_code_ancestors += '# CONTEXT\n' + index[0][0] + '\n# CHANGED BLOCK\n' + index[0][1] +\
-                                          '\n# END\n'
+            changed_code_ancestors += '~~ CONTEXT\n' + index[0][0] + '\n~~ CHANGED BLOCK\n' + index[0][1] +\
+                                          '\n~~ END\n'
     write_changes_file(changed_code_ancestors)
 
 
