@@ -12,12 +12,13 @@ def check_token():
     answer = proc.communicate()
 
 
-def write_changes_file(changed_code_ancestors):
-    with open('log.changes', 'w') as changes_file:
+def write_changes_file(changed_code_ancestors, filename):
+    filename += '.changes'
+    with open(filename, 'w') as changes_file:
         changes_file.write(changed_code_ancestors)
 
 
-def main(input_echo_md, gdoc_id, warnings=False):
+def main(input_echo_md, gdoc_id, filename, warnings=False):
     extractor = mdparse.TableExtractor(warnings)
     tables = extractor.parse(input_echo_md)
     if tables is None:
@@ -47,7 +48,7 @@ def main(input_echo_md, gdoc_id, warnings=False):
         if index[1] in result:
             changed_code_ancestors += '~~ CONTEXT\n' + index[0][0] + '\n~~ CHANGED BLOCK\n' + index[0][1] +\
                                           '\n~~ END\n'
-    write_changes_file(changed_code_ancestors)
+    write_changes_file(changed_code_ancestors, filename)
 
 
 if __name__ == '__main__':
@@ -55,8 +56,10 @@ if __name__ == '__main__':
                                                  'finds differences, logs code that generates outdated information.')
     parser.add_argument('input', help='*.md file generated from *.rmd with "echo=TRUE"', action='store')
     parser.add_argument('gdoc_id', help='Gdoc id.', action='store')
+    parser.add_argument('name', help='Name for unique changes filename', action='store')
     args = parser.parse_args()
     gdoc_id = args.gdoc_id
     input_echo_md = args.input
-    main(input_echo_md, gdoc_id, warnings=False)
+    filename = args.name
+    main(input_echo_md, gdoc_id, filename, warnings=False)
 
