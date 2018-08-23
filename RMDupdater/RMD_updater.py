@@ -18,24 +18,12 @@ def write_changes_file(changed_code_ancestors, filename):
         changes_file.write(changed_code_ancestors)
 
 
-def main(input_echo_md, gdoc_id, filename, warnings=False):
+def main(input_echo_md, gdoc_id, filename, fair, warnings=False):
     extractor = mdparse.TableExtractor(warnings)
     tables = extractor.parse(input_echo_md)
-    if tables is None:
-        return  # some errors occurred
-    tables_array = list()  # this array will be sent to apps script api
-    for index in tables.keys():  # creating array with tables and indexes, deleting empty headers.
-        table = tables[index]
-        header_row = table[0]
-        has_content = False
-        for cell in header_row:
-            if cell != '':
-                has_content = True
-        if not has_content:
-            table.pop(0)
-        tables_array.append(table)
-    check_token()
-    result = check.run_comparison(gdoc_id=gdoc_id, tables=tables_array)
+    fair_extractor = mdparse.TableExtractor(False)
+    fair_tables = fair_extractor.parse(fair)
+    result = check.run_local_comparison(tables, fair_tables)
     if result is None:  # some errors occurred
         return
     if len(result) == 0:
@@ -57,9 +45,11 @@ if __name__ == '__main__':
     parser.add_argument('input', help='*.md file generated from *.rmd with "echo=TRUE"', action='store')
     parser.add_argument('gdoc_id', help='Gdoc id.', action='store')
     parser.add_argument('name', help='Name for unique changes filename', action='store')
+    parser.add_argument('fair', help='actual fair version', action='store')
     args = parser.parse_args()
     gdoc_id = args.gdoc_id
     input_echo_md = args.input
     filename = args.name
-    main(input_echo_md, gdoc_id, filename, warnings=False)
+    fair = args.fair
+    main(input_echo_md, gdoc_id, filename, fair, warnings=False)
 

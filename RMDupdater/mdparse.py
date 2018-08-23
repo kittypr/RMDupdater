@@ -68,11 +68,16 @@ class TableExtractor:
         row = list()
         headers = tab['c'][3]
         if headers:
+            has_content = False
             for col in headers:
                 self.list_parse(col, cell_content=True)
                 cell_content = self.get_content()
                 row.append(cell_content)
-            table.append(row)
+                if cell_content != '':
+                    has_content = True
+            if has_content:
+                row = tuple(row)
+                table.append(row)
         t_content = tab['c'][4]
         for line in t_content:
             row = list()
@@ -80,7 +85,9 @@ class TableExtractor:
                 self.list_parse(col, cell_content=True)
                 cell_content = self.get_content()
                 row.append(cell_content)
+            row = tuple(row)
             table.append(row)
+        table = tuple(table)
         self.tables[((self.context, self.ancestor), len(self.tables))] = table
 
     def dict_parse(self, dictionary, cell_content=False):
