@@ -63,7 +63,7 @@ def create_diff(fromlines, tolines, filename):
     html_output = filename + '_rmdupd.html'
     with open(html_output, 'w') as out:
         comparator = difflib.HtmlDiff()
-        result = comparator.make_file(fromlines=fromlines, tolines=tolines, context=True)
+        result = comparator.make_file(fromlines=fromlines, tolines=tolines)
         out.write(result)
 
 
