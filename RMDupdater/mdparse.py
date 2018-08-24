@@ -5,7 +5,8 @@ from copy import copy
 
 TABLE = ('Table', )
 CODE = ('Code', 'CodeBlock')
-BLOCK = ('Div', 'Header', 'Span')
+BLOCK = ('Div', 'Header')
+IGNORED = ('Span', )
 
 
 class MdExtractor:
@@ -57,9 +58,12 @@ class MdExtractor:
         con = 1
         if block['t'] == 'Header':
             con = 2
-        self.list_parse(block['c'][con], cell_content=True)
+        self.list_parse(block['c'][con])
         if not cell_content:
             self.save_text()
+
+    def write_ignored(self, span):
+        self.list_parse(span['c'][1])
 
     def write_table(self, tab):
         """Extracts table and saves them with code block they were made from.
@@ -117,8 +121,10 @@ class MdExtractor:
         try:
             if dictionary['t'] in TABLE and not cell_content:  # blocks that may have content
                 self.write_table(dictionary)
-            elif dictionary['t'] in BLOCK:  #
+            elif dictionary['t'] in BLOCK:
                 self.write_special_block(dictionary, cell_content)
+            elif dictionary['t'] in IGNORED:
+                self.write_ignored(dictionary)
             elif dictionary['t'] in CODE and not cell_content:  # parse it only if it is outside table
                 self.write_code(dictionary)
             elif 'c' in dictionary:

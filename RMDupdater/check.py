@@ -59,27 +59,12 @@ def run_local_comparison(tables, fair_tables):
         return None
 
 
-def create_diff(fair, current, filename):
-
-    command = 'pandoc ' + fair + ' -t markdown'
-    proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    res = proc.communicate()
-    if res[1]:
-        print('PROCESS FAILED. SEE BELOW:')
-        print(str(res[1]))
-        return None  # sending stderr output to user
-    else:
-        fair_copy = res[0]
-        html_output = filename + "_rmdupd.html"
-        filename += "_fair_md_rmdupd.md"
-        with open(filename, 'wb') as fair_md_file:
-            fair_md_file.write(fair_copy)
-        with open(filename, 'r') as tolines, open(current, 'r') as fromlines, open(html_output, 'w') as out:
-            fromlines = fromlines.readlines()
-            tolines = tolines.readlines()
-            comparator = difflib.HtmlDiff()
-            result = comparator.make_file(fromlines=fromlines, tolines=tolines)
-            out.write(result)
+def create_diff(fromlines, tolines, filename):
+    html_output = filename + '_rmdupd.html'
+    with open(html_output, 'w') as out:
+        comparator = difflib.HtmlDiff()
+        result = comparator.make_file(fromlines=fromlines, tolines=tolines)
+        out.write(result)
 
 
 def run_local_text_comparison(text, fair_text):
@@ -88,4 +73,6 @@ def run_local_text_comparison(text, fair_text):
     difference = actual ^ current
     deleted = current & difference
     added = actual & difference
-    return {'deleted': tuple(deleted), 'added': tuple(added)}
+    deleted = tuple(deleted)
+    added = tuple(added)
+    return {'deleted': deleted, 'added': added}

@@ -35,7 +35,7 @@ def main(input_echo_md, gdoc_id, filename, fair, silent, warnings=False):
     fair_tables, fair_text = fair_extractor.parse(fair)
     text_result = check.run_local_text_comparison(text.values(), fair_text.values())
     if len(text_result['deleted']) > 0 or len(text_result['added']) > 0:
-        write_tchanges_file(text_result['deleted'], text_result['added'], filename)
+        check.create_diff(text_result['deleted'], text_result['added'], filename)
     result = check.run_local_comparison(tables, fair_tables)
     if result is None:  # some errors occurred
         return

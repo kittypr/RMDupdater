@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='RMDupdater',
-    version='0.0.6',
+    version='0.0.7',
     packages=find_packages(),
     url='https://github.com/kittypr/RMDupdater',
     license='MIT',
@@ -17,5 +17,5 @@ setup(
     ],
 
     install_requires=['oauth2client', 'google-api-python-client', 'httplib2'],
-    scripts=['RMDupdater/RMD_updater.py', 'RMDupdater/RMD_updater_create_token.py']
+    scripts=['RMDupdater/RMD_updater.py']
 )
