@@ -33,9 +33,11 @@ def main(input_echo_md, gdoc_id, filename, fair, silent, warnings=False):
     tables, text = extractor.parse(input_echo_md)
     fair_extractor = mdparse.MdExtractor(False)
     fair_tables, fair_text = fair_extractor.parse(fair)
+    check.create_diff(text.values(), fair_text.values())
     text_result = check.run_local_text_comparison(text.values(), fair_text.values())
     if len(text_result['deleted']) > 0 or len(text_result['added']) > 0:
-        check.create_diff(text_result['deleted'], text_result['added'], filename)
+        pass
+        # check.create_diff(text_result['deleted'], text_result['added'], filename)
     result = check.run_local_comparison(tables, fair_tables)
     if result is None:  # some errors occurred
         return
