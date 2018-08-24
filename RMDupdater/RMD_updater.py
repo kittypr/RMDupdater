@@ -28,7 +28,7 @@ def write_tchanges_file(deleted, added, filename):
         tchanges_file.write("\n~~ END\n")
 
 
-def main(input_echo_md, gdoc_id, filename, fair, silent, warnings=False):
+def main(input_echo_md, gdoc_id, filename, fair, warnings=False):
     extractor = mdparse.MdExtractor(warnings)
     tables, text = extractor.parse(input_echo_md)
     fair_extractor = mdparse.MdExtractor(False)
@@ -61,12 +61,10 @@ if __name__ == '__main__':
     parser.add_argument('gdoc_id', help='Gdoc id.', action='store')
     parser.add_argument('name', help='Name for unique changes filename', action='store')
     parser.add_argument('fair', help='actual fair version', action='store')
-    parser.add_argument('silent', help='Clean rmd output', action='store')
     args = parser.parse_args()
     gdoc_id = args.gdoc_id
     input_echo_md = args.input
     filename = args.name
     fair = args.fair
-    silent = args.silent
-    main(input_echo_md, gdoc_id, filename, fair, silent, warnings=False)
+    main(input_echo_md, gdoc_id, filename, fair, warnings=False)
 
