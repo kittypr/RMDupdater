@@ -60,14 +60,17 @@ def run_local_comparison(tables, fair_tables):
 
 
 def create_diff(fromlines, tolines, filename):
+    # files diff with context
     html_output = filename + '_rmdupd.html'
     with open(html_output, 'w') as out:
         comparator = difflib.HtmlDiff()
         result = comparator.make_file(fromlines=fromlines, tolines=tolines, context=True, numlines=1)
         out.write(result)
+        out.write('\n')
 
 
 def run_local_text_comparison(text, fair_text):
+    # find deleted and new blocks
     current = frozenset(text)
     actual = frozenset(fair_text)
     difference = actual ^ current
