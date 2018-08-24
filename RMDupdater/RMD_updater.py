@@ -18,11 +18,24 @@ def write_changes_file(changed_code_ancestors, filename):
         changes_file.write(changed_code_ancestors)
 
 
-def main(input_echo_md, gdoc_id, filename, fair, warnings=False):
-    extractor = mdparse.TableExtractor(warnings)
-    tables = extractor.parse(input_echo_md)
-    fair_extractor = mdparse.TableExtractor(False)
-    fair_tables = fair_extractor.parse(fair)
+def write_tchanges_file(deleted, added, filename):
+    filename += '.tchanges'
+    with open(filename, 'w') as tchanges_file:
+        tchanges_file.write("~~ DELETED\n")
+        tchanges_file.write('\n'.join(deleted))
+        tchanges_file.write("\n~~ ADDED\n")
+        tchanges_file.write('\n'.join(added))
+        tchanges_file.write("\n~~ END\n")
+
+
+def main(input_echo_md, gdoc_id, filename, fair, silent, warnings=False):
+    extractor = mdparse.MdExtractor(warnings)
+    tables, text = extractor.parse(input_echo_md)
+    fair_extractor = mdparse.MdExtractor(False)
+    fair_tables, fair_text = fair_extractor.parse(fair)
+    text_result = check.run_local_text_comparison(text.values(), fair_text.values())
+    if len(text_result['deleted']) > 0 or len(text_result['added']) > 0:
+        write_tchanges_file(text_result['deleted'], text_result['added'], filename)
     result = check.run_local_comparison(tables, fair_tables)
     if result is None:  # some errors occurred
         return
@@ -46,10 +59,12 @@ if __name__ == '__main__':
     parser.add_argument('gdoc_id', help='Gdoc id.', action='store')
     parser.add_argument('name', help='Name for unique changes filename', action='store')
     parser.add_argument('fair', help='actual fair version', action='store')
+    parser.add_argument('silent', help='Clean rmd output', action='store')
     args = parser.parse_args()
     gdoc_id = args.gdoc_id
     input_echo_md = args.input
     filename = args.name
     fair = args.fair
-    main(input_echo_md, gdoc_id, filename, fair, warnings=False)
+    silent = args.silent
+    main(input_echo_md, gdoc_id, filename, fair, silent, warnings=False)
 

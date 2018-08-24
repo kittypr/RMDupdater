@@ -8,10 +8,11 @@ CODE = ('Code', 'CodeBlock')
 BLOCK = ('Div', 'Header', 'Span')
 
 
-class TableExtractor:
+class MdExtractor:
 
     def __init__(self, warnings):
         self.tables = dict()
+        self.text = dict()
         self.context = ''
         self.ancestor = ''
         self.content = ''
@@ -29,6 +30,12 @@ class TableExtractor:
         self.context = copy(self.ancestor)
         self.ancestor = ancestor
 
+    def save_text(self):
+        # write collected text info
+        content = self.get_content()
+        if content != '':
+            self.text[((self.context, self.ancestor), len(self.text))] = content
+
     def write_code(self, code):
         """Saves code block that creates other elements in case ones were changed.
         Since, element with title 'Code' or 'CodeBlock' has special structure of 'c'(Content) field, that looks like:
@@ -40,13 +47,19 @@ class TableExtractor:
         Args:
             code - element with title 'Code' or 'CodeBlock'.
         """
+
+        self.save_text()
         self.save_ancestor(code['c'][1])
 
-    def write_special_block(self, block):
+    def write_special_block(self, block, cell_content):
+        if not cell_content:
+            self.save_text()
         con = 1
         if block['t'] == 'Header':
             con = 2
         self.list_parse(block['c'][con], cell_content=True)
+        if not cell_content:
+            self.save_text()
 
     def write_table(self, tab):
         """Extracts table and saves them with code block they were made from.
@@ -64,6 +77,8 @@ class TableExtractor:
         Args:
             tab - dictionary with 't': 'Table".
         """
+        self.save_text()
+
         table = list()
         row = list()
         headers = tab['c'][3]
@@ -100,26 +115,29 @@ class TableExtractor:
             cell_content - indicates either we inside or outside of table cell
         """
         try:
-            if dictionary['t'] in TABLE:  # blocks that may have content
+            if dictionary['t'] in TABLE and not cell_content:  # blocks that may have content
                 self.write_table(dictionary)
-            elif dictionary['t'] in BLOCK and cell_content:  # parse it only if it is inside table
-                self.write_special_block(dictionary)
+            elif dictionary['t'] in BLOCK:  #
+                self.write_special_block(dictionary, cell_content)
             elif dictionary['t'] in CODE and not cell_content:  # parse it only if it is outside table
                 self.write_code(dictionary)
-            elif dictionary['t'] == 'Para' and cell_content:
-                self.add_content('\n')
-            elif 'c' in dictionary and cell_content:
+            elif 'c' in dictionary:
                 if type(dictionary['c']) == str:
                     self.add_content(dictionary['c'])
                 if type(dictionary['c']) == list:
                     self.list_parse(dictionary['c'], cell_content)
-            elif cell_content:  # blocks without content
+            else:  # blocks without content
                 if dictionary['t'] == 'Space':
                     self.add_content(' ')
                 elif dictionary['t'] == 'SoftBreak':
                     self.add_content(' ')
                 elif dictionary['t'] == 'LineBreak':
                     self.add_content('\n')
+            if dictionary['t'] == 'Para':
+                if cell_content:
+                    self.add_content('\n')
+                else:
+                    self.save_text()
         except KeyError:
             if self.warnings:
                 print('Untypical block. Some information might be lost.')
@@ -172,4 +190,4 @@ class TableExtractor:
         else:
             document = json.loads(res[0])
             self.document_parse(document)
-            return self.tables
+            return self.tables, self.text
