@@ -68,5 +68,5 @@ if __name__ == '__main__':
     parser.add_argument('fair', help='Actual fair version from gdoc.', action='store')
     args = parser.parse_args()
 
-    main(args.input_echo_md, args.gdoc_id, args.filename, args.fair, warnings=False)
+    main(args.input, args.gdoc_id, args.name, args.fair, warnings=False)
 
