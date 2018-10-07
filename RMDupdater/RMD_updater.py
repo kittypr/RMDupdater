@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import json
 import subprocess
 
 import check
@@ -90,6 +91,12 @@ def main(input_echo_md, gdoc_id, filename, fair, warnings=False):
     tables_json = {'context': [different[0] for different in result],
                    'ancestor': [different[1] for different in result]}
     write_changes_file(changes_string, filename)
+
+    textj_filename = filename + '_text_changes.json'
+    tablesj_filename = filename + '_tables_changes.json'
+    with open(textj_filename, 'w') as text_file, open(tablesj_filename, 'w') as tables_file:
+        json.dump(text_json, text_file)
+        json.dump(tables_json, tables_file)
 
 
 if __name__ == '__main__':
