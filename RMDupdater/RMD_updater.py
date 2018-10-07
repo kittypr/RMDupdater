@@ -61,6 +61,9 @@ def main(input_echo_md, gdoc_id, filename, fair, warnings=False):
     # creating *.tchanges file
     changes, changed = check.run_local_text_comparison(text, fair_text)
     tchanges_string = ''
+    text_json = {'text': list(),
+                 'context': list(),
+                 'ancestor': list()}
     if len(changed) > 0:
         for change in changed:
             if text[change][2] != '':
@@ -68,6 +71,9 @@ def main(input_echo_md, gdoc_id, filename, fair, warnings=False):
                                    '\n~~ TEXT\n' + text[change][0] + '\n~~ END\n'
             else:
                 tchanges_string += '~~ CONTEXT\n\n~~ CHANGED BLOCK\n\n~~ TEXT\n' + text[change][0] + '\n~~ END\n'
+            text_json['text'].append(text[change][0])
+            text_json['context'].append(text[change][1])
+            text_json['ancestor'].append(text[change][2])
     write_tchanges_file(tchanges_string, filename)
 
     # creating *.changes file
@@ -80,8 +86,9 @@ def main(input_echo_md, gdoc_id, filename, fair, warnings=False):
         print('OUTDATED BLOCKS WERE FOUNDED')
 
     for different in result:
-        changes_string += '~~ CONTEXT\n' + different[0] + '\n~~ CHANGED BLOCK\n' + different[1] +\
-                                          '\n~~ END\n'
+        changes_string += '~~ CONTEXT\n' + different[0] + '\n~~ CHANGED BLOCK\n' + different[1] + '\n~~ END\n'
+    tables_json = {'context': [different[0] for different in result],
+                   'ancestor': [different[1] for different in result]}
     write_changes_file(changes_string, filename)
 
 
