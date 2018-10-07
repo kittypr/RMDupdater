@@ -52,14 +52,14 @@ def main(input_echo_md, gdoc_id, filename, fair, warnings=False):
     :return: -
     """
     extractor = mdparse.MdExtractor(warnings)
-    tables, text, plain_text = extractor.parse(input_echo_md)
+    tables, text = extractor.parse(input_echo_md)
     fair_extractor = mdparse.MdExtractor(False)
-    fair_tables, null, fair_plain_text = fair_extractor.parse(fair)
+    fair_tables, fair_text = fair_extractor.parse(fair)
     # creating html diff table.
-    check.create_diff(plain_text, fair_plain_text, filename)
+    check.create_diff(text, fair_text, filename)
 
     # creating *.tchanges file
-    changes, changed = check.run_local_text_comparison(plain_text, fair_plain_text)
+    changes, changed = check.run_local_text_comparison(text, fair_text)
     tchanges_string = ''
     if len(changed) > 0:
         for change in changed:

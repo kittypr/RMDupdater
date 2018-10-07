@@ -28,15 +28,12 @@ class MdExtractor:
             tables = { ((previous code, code's context), index): [[cell, cell], [cell, cell]]; ... },
         Creates empty list of text, it will collect all text:
             text = [(text, code's context, previous code), ... ]
-        Creates empty list of text (in purpose to not iterate them again):
-            plain_text = [ text, text, ... ]
         Creates 3 empty string: to collect words, to save code, to save previous code.
 
         :param: warnings: logical, if TRUE additional parse information will be shown.
         """
         self.tables = list()
         self.text = list()
-        self.plain_text = list()
         self.context = ''
         self.ancestor = ''
         self.content = ''
@@ -76,7 +73,6 @@ class MdExtractor:
         content = self.get_content()
         if content != '':
             self.text.append((content, self.context, self.ancestor))
-            self.plain_text.append(content)
 
     def write_code(self, code):
         """Saves code block that creates other elements in case ones were changed.
@@ -273,4 +269,4 @@ class MdExtractor:
         else:
             document = json.loads(res[0])
             self.document_parse(document)
-            return self.tables, self.text, self.plain_text
+            return self.tables, self.text

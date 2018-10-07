@@ -72,8 +72,8 @@ def run_local_text_comparison(text, fair_text):
              changed = list of indexes in which difference was found.
     """
     changed = list()
-    current = frozenset(text)
-    actual = frozenset(fair_text)
+    current = frozenset([item[0] for item in text])
+    actual = frozenset([item[0] for item in fair_text])
     difference = actual ^ current
     deleted = current & difference
     added = actual & difference
@@ -92,6 +92,8 @@ def create_diff(fromlines, tolines, filename):
     :param filename: unique prefix.
     :return: -
     """
+    fromlines = list([text[0] for text in fromlines])
+    tolines = list([text[0] for text in tolines])
     html_output = filename + '_rmdupd.html'
     with open(html_output, 'wb') as out:
         comparator = difflib.HtmlDiff(tabsize=4)
