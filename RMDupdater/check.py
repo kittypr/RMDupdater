@@ -52,20 +52,14 @@ def run_local_comparison(tables, fair_tables):
 
     :param tables: tables from current reports.
     :param fair_tables: tables from fair copy from gdoc.
-    :return: result: list of indexes in which difference was found.
+    :return: result: list of tuples of context and ancestor that refer to tables that differs from tables in fair copy.
     """
     result = list()
-    additional = None
+    for current, fair in zip(tables, fair_tables):
+        if current[0] != fair[0]:
+            result.append(current[1])
     if len(tables) > len(fair_tables):
-        additional = [i for i in range(len(fair_tables), len(tables))]
-    for key, fair_key in zip(tables.keys(), fair_tables.keys()):
-        table = tables[key]
-        fair_table = fair_tables[fair_key]
-        same = (table == fair_table)
-        if not same:
-            result.append(key[1])
-    if additional:
-        result.extend(additional)
+        result.extend([current[1] for current in tables[len(fair_tables):]])
     return result
 
 

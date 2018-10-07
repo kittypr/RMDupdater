@@ -79,9 +79,8 @@ def main(input_echo_md, gdoc_id, filename, fair, warnings=False):
     else:
         print('OUTDATED BLOCKS WERE FOUNDED')
 
-    for index in tables.keys():
-        if index[1] in result:
-            changes_string += '~~ CONTEXT\n' + index[0][0] + '\n~~ CHANGED BLOCK\n' + index[0][1] +\
+    for different in result:
+        changes_string += '~~ CONTEXT\n' + different[0] + '\n~~ CHANGED BLOCK\n' + different[1] +\
                                           '\n~~ END\n'
     write_changes_file(changes_string, filename)
 

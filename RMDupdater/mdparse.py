@@ -34,7 +34,7 @@ class MdExtractor:
 
         :param: warnings: logical, if TRUE additional parse information will be shown.
         """
-        self.tables = dict()
+        self.tables = list()
         self.text = list()
         self.plain_text = list()
         self.context = ''
@@ -170,7 +170,8 @@ class MdExtractor:
             row = tuple(row)
             table.append(row)
         table = tuple(table)
-        self.tables[((self.context, self.ancestor), len(self.tables))] = table
+        self.tables.append((table, (self.context, self.ancestor)))
+        # self.tables[((self.context, self.ancestor), len(self.tables))] = table
 
     def dict_parse(self, dictionary, cell_content=False):
         """Parses dictionaries.
