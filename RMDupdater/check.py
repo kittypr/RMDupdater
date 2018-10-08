@@ -72,7 +72,8 @@ def run_local_text_comparison(text, fair_text):
              changed = list of indexes in which difference was found.
     """
     changed = list()
-    current = frozenset([item[0] for item in text])
+    current_list = [item[0] for item in text]
+    current = frozenset(current_list)
     actual = frozenset([item[0] for item in fair_text])
     difference = actual ^ current
     deleted = current & difference
@@ -80,7 +81,7 @@ def run_local_text_comparison(text, fair_text):
     deleted = tuple(deleted)
     added = tuple(added)
     for deleted_text in deleted:
-        changed.append(text.index(deleted_text))
+        changed.append(current_list.index(deleted_text))
     return {'deleted': deleted, 'added': added}, changed
 
 
