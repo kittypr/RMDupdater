@@ -71,6 +71,7 @@ def run_local_text_comparison(text, fair_text):
     :return: {deleted: tuple of deleted blocks, added: tuple of new blocks},
              changed = list of indexes in which difference was found.
     """
+
     changed = list()
     current_list = [item[0] for item in text]
     current = frozenset(current_list)
