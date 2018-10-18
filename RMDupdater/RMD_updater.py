@@ -15,6 +15,7 @@ def check_token():  # left for future functionality
 
 def main(input_echo_md, gdoc_id, filename, fair, warnings=False):
     """Starts the comparing process.
+
     :param input_echo_md: string, path to .md document.
     :param gdoc_id: string, goodle document id.
     :param filename: string, unique prefix to all files.

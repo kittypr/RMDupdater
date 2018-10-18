@@ -15,6 +15,7 @@ SCRIPT_ID = 'MfUCDEAFYCuUxb_9IPU7Cho8zoCCdfz7A'
 
 def run_comparison(function_name, parameters):  # left for future functionality
     """Calls the Apps Script API.
+
     :param function_name: function name that will be called in google apps script.
     :param parameters: function's parameters.
     :return: if succeed:
@@ -48,6 +49,7 @@ def run_comparison(function_name, parameters):  # left for future functionality
 
 def run_local_comparison(tables, fair_tables):
     """Compares two tuples of tuples which represent tables.
+
     :param tables: tables from current reports.
     :param fair_tables: tables from fair copy from gdoc.
     :return: result: list of tuples of context and ancestor that refer to tables that differs from tables in fair copy.
@@ -63,6 +65,7 @@ def run_local_comparison(tables, fair_tables):
 
 def run_local_text_comparison(text, fair_text):
     """Finds deleted and new blocks.
+
     :param text: text blocks from current report.
     :param fair_text: text blocks from fair copy from gdoc.
     :return: {deleted: tuple of deleted blocks, added: tuple of new blocks},
@@ -84,6 +87,7 @@ def run_local_text_comparison(text, fair_text):
 
 def create_diff(fromlines, tolines, filename):
     """Creates diff file.
+
     :param fromlines: current blocks.
     :param tolines: fair copy's blocks.
     :param filename: unique prefix.
