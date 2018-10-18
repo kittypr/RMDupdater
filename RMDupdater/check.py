@@ -1,9 +1,11 @@
+import difflib
+
+import lcs
+
 from apiclient import errors
 from apiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file as oauth_file
-
-import difflib
 
 
 CLIENT_SECRETS_FILE = "client_secret.json"
@@ -72,7 +74,12 @@ def run_local_text_comparison(text, fair_text):
              changed = list of indexes in which difference was found.
     """
 
+
     changed = list()
+    cl = [item[0] for item in text]
+    al = [item[0] for item in fair_text]
+    lcs.by_LCS(cl, al)
+    lcs.by_sort(cl, al)
     current_list = [item[0] for item in text]
     current = frozenset(current_list)
     actual = frozenset([item[0] for item in fair_text])

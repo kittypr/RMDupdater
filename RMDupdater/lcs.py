@@ -14,7 +14,7 @@ def by_LCS(X, Y):
             else:
                 C[i][j] = (max(C[i-1][j], C[i][j-1], key=len))
     with open('time_log.txt', 'a+') as log:
-        log.write("LCS: " + str(st-time.time()) + "\n")
+        log.write("LCS: " + str(st-time.time()) + "\n" + str(C[m][n]) + "\n")
     return C
 
 def by_sort(x, y):
@@ -30,7 +30,7 @@ def by_sort(x, y):
             elif x[i] < y[j]:
                 break
     with open('time_log.txt', 'a+') as log:
-        log.write("SORT: " + str(st-time.time()) + "\n")
+        log.write("SORT: " + str(st-time.time()) + "\n" + str(res) + "\n")
     return res
 
 # X = ['hello ', 'my ', 'dear ', 'friend, ', 'I`m ', 'Julia.']
