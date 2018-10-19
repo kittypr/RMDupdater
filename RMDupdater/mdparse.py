@@ -22,9 +22,9 @@ class MdExtractor:
     def __init__(self, warnings):
         """Gets logical indicator either user needs additional information or not.
 
-        Creates empty dict, it will collect all tables:
-            tables = { ((previous code, code's context), index): [[cell, cell], [cell, cell]]; ... },
-        Creates empty list of text, it will collect all text:
+        Creates empty list, it will collect all tables:
+            tables = [([[cell, cell], [cell, cell], ...], (previous code, code's context))],
+        Creates empty list, it will collect all text:
             text = [(text, code's context, previous code), ... ]
         Creates 3 empty string: to collect words, to save code, to save previous code.
 
@@ -249,7 +249,7 @@ class MdExtractor:
 
         :param source: string, path to *.md document
         :return: if succeed:
-                     tables: = { ((previous code, code's context), index): [[cell, cell], [cell, cell]]; ... },
+                     tables: = [ ([[cell, cell], [cell, cell], ...], (previous code, code's context)) ],
                              all collected tables and their code ancestors.
                      text: = [(text, code's context, previous code), ... ]
                            all collected text blocks and their code ancestors.
